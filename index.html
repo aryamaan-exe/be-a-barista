@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Be A Barista</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.0.4/dist/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://unpkg.com/super-hands@3.0.3/dist/super-hands.min.js"></script>
+    
+    <script src="script.js"></script>
+
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <a-scene background="color: #ECECEC"
+      vr-mode-ui="enabled: true" webxr="optionalFeatures: local-floor, bounded-floor">
+      <!-- Assets -->
+      <a-assets>
+        <img id="floor-model" src="assets/floor.png" />
+        <img id="walls-model" src="assets/wall.png" />
+        <img id="roof-model" src="assets/roof.jpg" />
+        <a-asset-item id="counter-model" src="assets/table.glb"></a-asset-item>
+        <a-asset-item id="coffee-machine-model" src="assets/coffee-machine.glb"></a-asset-item>
+        <a-asset-item id="cup-model" src="assets/cup.glb"></a-asset-item>
+        <a-asset-item id="customer-model" src="assets/customer.glb"></a-asset-item>
+      </a-assets>
+      
+      <!-- Mixins -->
+      <a-mixin id="wall"
+        geometry="primitive: plane;
+                  width: 6; height: 6"
+        material="src: #walls-model; color: #ffe388">
+      </a-mixin>
+
+      <!-- Camera + cursor -->
+      <a-entity id="rig" position="-0.5 0 0">
+        <a-camera look-controls position="0 1.6 0" wasd-controls-enabled="false">
+          <a-cursor cursor-complementary-color raycaster="objects: .clickable" fuse-logger fuse="true" fuseTimeout="1000" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03;" material="color: black; shader: flat"
+            animation__fusing="property: geometry.thetaLength; from: 0; to: 360; dur: 1500; startEvents: fusing;"
+            animation__reset="property: geometry.thetaLength; from: 360; to: 360; dur: 1; startEvents: mouseleave;"
+          >
+          </a-cursor>
+        </a-camera>
+
+        <!-- Hands -->
+        <a-entity id="left-hand"
+          hand-controls="hand: left; controller: 0; handModelStyle: highPoly"
+          physics-collider
+          super-hands
+          sphere-collider="objects: .grabbable">
+        </a-entity>
+        <a-entity id="right-hand"
+          sound="src:url(assets/pop.mp3); positional: false"
+          hand-controls="hand: right; controller: 1; handModelStyle: highPoly"
+          physics-collider
+          super-hands
+          sphere-collider="objects: .grabbable">
+        </a-entity>
+      </a-entity>
+
+      <!-- Floor -->
+      <a-plane 
+        src="#floor-model"
+        width="20" height="20"
+        color="#aaaaaa"
+        position="0 0 0" rotation="-90 0 0"
+      >
+      </a-plane>
+
+      <!-- Roof -->
+      <a-plane 
+        width="20" height="20"
+        src="#roof-model"
+        position="0 6 0" rotation="90 0 0"
+      >
+      </a-plane>
+
+      <!-- Walls -->
+      <a-entity mixin="wall"
+        position="3 1.5 0" rotation="0 -90 0"
+      >
+      </a-entity>
+      <a-entity mixin="wall"
+        position="0 1.5 3" rotation="0 180 0"
+      >
+      </a-entity>
+      <a-entity mixin="wall"
+        position="-3 1.5 0" rotation="0 90 0"
+      >
+      </a-entity>
+      <a-entity mixin="wall"
+        position="0 1.5 -3" rotation="0 0 0"
+      >
+      </a-entity>
+
+      <a-box id="counter"
+        width="2.5" height="1" depth="0.8"
+        color="#692008" opacity="0"
+        position="0 0.5 -1.5" scale="0.7 0.5 0.5">
+        <a-entity gltf-model="#counter-model"></a-entity>
+      </a-box>
+
+      <a-box
+        id="coffee-machine"
+        sound="src:url(assets/pop.mp3); positional: false;"
+        width="0.5" height="0.8" depth="0.4"
+        color="#111111" opacity="0"
+        position="-0.7 1.25 -1.5"
+        fuse-handler
+        animation="property: rotation;
+                  from: 0 0 0; to: 0 5 0; dur: 250;
+                  startEvents: click; pauseEvents: mouseleave;
+                  elasticity: 1000;
+                  loop: true; dir: alternate; easing: easeInSine">
+          <a-entity class="clickable"
+                    gltf-model="#coffee-machine-model"
+                    position="0 -0.25 0"
+                    scale="0.008 0.008 0.008">
+          </a-entity>
+      </a-box>
+
+      <a-box
+        id="brew-button" class="clickable"
+        sound="src:url(assets/coffee-machine.mp3); positional: false;"
+        visible="false"
+        width="0.5" height="0.2" depth="0.05"
+        position="-0.7 2 -1.25"
+        animation__fusing="property: position;
+                          from: -0.7 2 -1.25; to: -0.7 2.05 -1.25;
+                          startEvents: fusing; pauseEvents: mouseleave;
+                          loop: true; dir: alternate"
+         brew-button-clicked>
+
+        <a-text value="Brew"
+                color="#000000" align="center"
+                position="0 0 0.06"
+                width="4">
+        </a-text>
+      </a-box>
+
+      <a-box id="espresso-shot"
+        visible="false" color="#280c02"
+        width="0.2" height="0.3" depth="0.2"
+        position="0 1.18 -1.5" scale="0.25 0.25 0.25" rotation="0 -90 0"
+        grabbable
+        raycaster="objects: .detectable; direction: 0 0 -1"
+        espresso-shot>
+        <a-entity gltf-model="#cup-model" class="grabbable"></a-entity>
+      </a-box>
+
+      <a-cylinder id="customer"
+        sound="src: url(assets/cashier.mp3); positional: false"
+        visible="true" color="#977575"
+        material="opacity: 0;"
+        radius="0.3"
+        height="6"
+        position="-0.5 0.5 -2.5" scale="0.5 0.5 0.5"
+        customer-order>
+        <a-entity gltf-model="#customer-model" animation-mixer="clip: Idle;">
+        </a-entity>
+      </a-cylinder>
+
+      <a-box id="play-music" class="clickable"
+        position="-2 2 -2"
+        width="0.5" height="0.5" depth="0.05"
+        sound="src:url(assets/music.mp3); loop: true; positional: false;"
+        play-music>
+        <a-text value="Music:\nOff"
+                color="#000000" align="center"
+                position="0 0 0.06"
+                width="3">
+        </a-text>
+      </a-box>
+
+      <a-box id="balance"
+        position="-2 1.45 -2"
+        width="0.5" height="0.5" depth="0.05">
+        <a-text value="$0"
+                color="#000000" align="center"
+                position="0 0 0.06"
+                width="3">
+        </a-text>
+      </a-box>
+
+      <a-box id="tutorial" class="clickable"
+        position="-2 0.90 -2"
+        width="0.5" height="0.5" depth="0.05"
+        sound="src:url(assets/pop.mp3); positional: false;"
+        tutorial>
+        <a-text value="Tutorial"
+                color="#000000" align="center"
+                position="0 0 0.06"
+                width="3">
+        </a-text>
+      </a-box>
+
+      <a-sky color="aqua"></a-sky>
+    </a-scene>
+  </body>
+</html>
