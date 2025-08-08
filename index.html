@@ -18,7 +18,7 @@
   </head>
 
   <body>
-    <a-scene background="color: #ECECEC"
+    <a-scene background="color: #ECECEC" scene
       vr-mode-ui="enabled: true" webxr="optionalFeatures: local-floor, bounded-floor">
       <!-- Assets -->
       <a-assets>
@@ -39,8 +39,8 @@
       </a-mixin>
 
       <!-- Camera + cursor -->
-      <a-entity id="rig" position="-0.5 0 0">
-        <a-camera look-controls position="0 1.6 0" wasd-controls-enabled="false">
+      <a-entity id="rig">
+        <a-camera id="camera" look-controls wasd-controls-enabled="true">
           <a-cursor cursor-complementary-color raycaster="objects: .clickable" fuse-logger fuse="true" fuseTimeout="1000" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03;" material="color: black; shader: flat"
             animation__fusing="property: geometry.thetaLength; from: 0; to: 360; dur: 1500; startEvents: fusing;"
             animation__reset="property: geometry.thetaLength; from: 360; to: 360; dur: 1; startEvents: mouseleave;"
@@ -65,53 +65,24 @@
       </a-entity>
 
       <!-- Floor -->
-      <a-plane 
-        src="#floor-model"
-        width="20" height="20"
-        color="#aaaaaa"
-        position="0 0 0" rotation="-90 0 0"
-      >
-      </a-plane>
+      <a-plane id="floor" src="#floor-model" />
 
       <!-- Roof -->
-      <a-plane 
-        width="20" height="20"
-        src="#roof-model"
-        position="0 6 0" rotation="90 0 0"
-      >
-      </a-plane>
+      <a-plane id="roof" src="#roof-model" />
 
       <!-- Walls -->
-      <a-entity mixin="wall"
-        position="3 1.5 0" rotation="0 -90 0"
-      >
-      </a-entity>
-      <a-entity mixin="wall"
-        position="0 1.5 3" rotation="0 180 0"
-      >
-      </a-entity>
-      <a-entity mixin="wall"
-        position="-3 1.5 0" rotation="0 90 0"
-      >
-      </a-entity>
-      <a-entity mixin="wall"
-        position="0 1.5 -3" rotation="0 0 0"
-      >
-      </a-entity>
+      <a-entity mixin="wall" id="rightWall" />
+      <a-entity mixin="wall" id="backWall" />
+      <a-entity mixin="wall" id="leftWall" />
+      <a-entity mixin="wall" id="frontWall" />
 
-      <a-box id="counter"
-        width="2.5" height="1" depth="0.8"
-        color="#692008" opacity="0"
-        position="0 0.5 -1.5" scale="0.7 0.5 0.5">
+      <a-box id="counter">
         <a-entity gltf-model="#counter-model"></a-entity>
       </a-box>
 
       <a-box
-        id="coffee-machine"
+        id="coffeeMachine"
         sound="src:url(assets/pop.mp3); positional: false;"
-        width="0.5" height="0.8" depth="0.4"
-        color="#111111" opacity="0"
-        position="-0.7 1.25 -1.5"
         fuse-handler
         animation="property: rotation;
                   from: 0 0 0; to: 0 5 0; dur: 250;
@@ -126,11 +97,9 @@
       </a-box>
 
       <a-box
-        id="brew-button" class="clickable"
+        id="brewButton" class="clickable"
         sound="src:url(assets/coffee-machine.mp3); positional: false;"
         visible="false"
-        width="0.5" height="0.2" depth="0.05"
-        position="-0.7 2 -1.25"
         animation__fusing="property: position;
                           from: -0.7 2 -1.25; to: -0.7 2.05 -1.25;
                           startEvents: fusing; pauseEvents: mouseleave;
@@ -144,10 +113,7 @@
         </a-text>
       </a-box>
 
-      <a-box id="espresso-shot"
-        visible="false" color="#280c02"
-        width="0.2" height="0.3" depth="0.2"
-        position="0 1.18 -1.5" scale="0.25 0.25 0.25" rotation="0 -90 0"
+      <a-box id="espressoShot"
         grabbable
         raycaster="objects: .detectable; direction: 0 0 -1"
         espresso-shot>
@@ -156,19 +122,13 @@
 
       <a-cylinder id="customer"
         sound="src: url(assets/cashier.mp3); positional: false"
-        visible="true" color="#977575"
         material="opacity: 0;"
-        radius="0.3"
-        height="6"
-        position="-0.5 0.5 -2.5" scale="0.5 0.5 0.5"
         customer-order>
         <a-entity gltf-model="#customer-model" animation-mixer="clip: Idle;">
         </a-entity>
       </a-cylinder>
 
-      <a-box id="play-music" class="clickable"
-        position="-2 2 -2"
-        width="0.5" height="0.5" depth="0.05"
+      <a-box id="playMusic" class="clickable"
         sound="src:url(assets/music.mp3); loop: true; positional: false;"
         play-music>
         <a-text value="Music:\nOff"
@@ -178,19 +138,11 @@
         </a-text>
       </a-box>
 
-      <a-box id="balance"
-        position="-2 1.45 -2"
-        width="0.5" height="0.5" depth="0.05">
-        <a-text value="$0"
-                color="#000000" align="center"
-                position="0 0 0.06"
-                width="3">
-        </a-text>
+      <a-box id="balance">
+        <a-text value="$0" align="center" />
       </a-box>
 
       <a-box id="tutorial" class="clickable"
-        position="-2 0.90 -2"
-        width="0.5" height="0.5" depth="0.05"
         sound="src:url(assets/pop.mp3); positional: false;"
         tutorial>
         <a-text value="Tutorial"

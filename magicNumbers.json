@@ -1,0 +1,94 @@
+{
+  "rightWall": {
+    "position": { "x": 3, "y": 1.5, "z": 0 },
+    "rotation": { "x": 0, "y": -90, "z": 0 }
+  },
+  "backWall": {
+    "position": { "x": 0, "y": 1.5, "z": 3 }
+  },
+  "leftWall": {
+    "position": { "x": -3, "y": 1.5, "z": 0 },
+    "rotation": { "x": 0, "y": 90, "z": 0 }
+  },
+  "frontWall": {
+    "position": { "x": 0, "y": 1.5, "z": -3 },
+    "rotation": { "x": 0, "y": 0, "z": 0 }
+  },
+  "floor": {
+    "width": 20,
+    "height": 20,
+    "position": { "x": 0, "y": 0, "z": 0 },
+    "rotation": { "x": -90, "y": 0, "z": 0 },
+    "color": "#aaaaaa"
+  },
+  "roof": {
+    "width": 20,
+    "height": 20,
+    "position": { "x": 0, "y": 6, "z": 0 },
+    "rotation": { "x": 90, "y": 0, "z": 0 }
+  },
+  "rig": {
+    "position": { "x": -0.5, "y": 0, "z": 0 }
+  },
+  "camera": {
+    "position": { "x": 0, "y": 1.6, "z": 0 }
+  },
+  "counter": {
+    "width": 2.5,
+    "height": 1,
+    "depth": 0.8,
+    "position": { "x": 0, "y": 0.5, "z": -1.5 },
+    "scale": { "x": 0.7, "y": 0.5, "z": 0.5 },
+    "color": "#692008",
+    "opacity": 0
+  },
+  "coffeeMachine": {
+    "width": 0.5,
+    "height": 0.8,
+    "depth": 0.4,
+    "position": { "x": -0.7, "y": 1.25, "z": -1.5 },
+    "color": "#111111",
+    "opacity": 0
+  },
+  "brewButton": {
+    "width": 0.5,
+    "height": 0.2,
+    "depth": 0.05,
+    "position": { "x": -0.7, "y": 2, "z": -1.25 }
+  },
+  "espressoShot": {
+    "width": 0.2,
+    "height": 0.3,
+    "depth": 0.2,
+    "position": { "x": 0, "y": 1.18, "z": -1.5 },
+    "scale": { "x": 0.25, "y": 0.25, "z": 0.25 },
+    "rotation": { "x": 0, "y": -90, "z": 0 },
+    "color": "#280c02",
+    "visible": false
+  },
+  "customer": {
+    "radius": 0.3,
+    "height": 6,
+    "position": { "x": -0.5, "y": 0.5, "z": -2.5 },
+    "scale": { "x": 0.5, "y": 0.5, "z": 0.5 },
+    "color": "#977575"
+  },
+  "playMusic": {
+    "width": 0.5,
+    "height": 0.5,
+    "depth": 0.05,
+    "position": { "x": -2, "y": 2, "z": -2 }
+  },
+  "balance": {
+    "width": 0.5,
+    "height": 0.5,
+    "depth": 0.05,
+    "position": { "x": -2, "y": 1.45, "z": -2 }
+  },
+  "tutorial": {
+    "width": 0.5,
+    "height": 0.5,
+    "depth": 0.05,
+    "position": { "x": -2, "y": 0.9, "z": -2 }
+  }
+}

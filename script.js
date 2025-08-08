@@ -1,6 +1,49 @@
 // Created by: Aryamaan Goswamy
 // Duplication not allowed. GitHub repository created for documentation purposes.
 
+let missing = [];
+
+AFRAME.registerComponent("scene", {
+    init: function() {
+        fetch("magicNumbers.json")
+        .then(response => response.json())
+        .then(initData => {
+            for (const [elementID, params] of Object.entries(initData)) {
+                const element = document.getElementById(elementID);
+                if (!element) {
+                    missing.push(elementID);
+                    continue;
+                }
+                for (const [param, value] of Object.entries(params)) {
+                    console.log(elementID, ":", param);
+                    element.setAttribute(param, value);
+                }
+            }
+        })
+        .catch(err => console.error("Error loading JSON:", err));
+    },
+    tick: function() {
+        if (missing.length === 0) return;
+        console.log(missing);
+        fetch("magicNumbers.json")
+        .then(response => response.json())
+        .then(initData => {
+            for (const [elementID, params] of Object.entries(initData)) {
+                if (!missing.includes(elementID)) continue;
+
+                const element = document.getElementById(elementID);
+                if (element) {
+                    for (const [param, value] of Object.entries(params)) {
+                        console.log(elementID, ":", param);
+                        element.setAttribute(param, value);
+                    }
+                    missing.splice(missing.indexOf(element), 1);
+                }
+            }
+        })
+    }
+});
+
 let tutorialMode = false;
 
 AFRAME.registerComponent("play-music", {
