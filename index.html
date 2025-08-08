@@ -29,18 +29,20 @@
         <a-asset-item id="coffee-machine-model" src="assets/coffee-machine.glb"></a-asset-item>
         <a-asset-item id="cup-model" src="assets/cup.glb"></a-asset-item>
         <a-asset-item id="customer-model" src="assets/customer.glb"></a-asset-item>
+        <a-asset-item id="steam-wand-model" src="assets/steam-wand.glb"></a-asset-item>
+        <a-asset-item id="latte-model" src="assets/latte.glb"></a-asset-item>
       </a-assets>
       
       <!-- Mixins -->
       <a-mixin id="wall"
         geometry="primitive: plane;
                   width: 6; height: 6"
-        material="src: #walls-model; color: #ffe388">
+        material="src: #walls-model; color: #ffe388; side: double">
       </a-mixin>
 
       <!-- Camera + cursor -->
       <a-entity id="rig" position="-0.5 0 0">
-        <a-camera look-controls position="0 1.6 0" wasd-controls-enabled="false">
+        <a-camera id="camera" look-controls position="0 1 0" wasd-controls-enabled="true">
           <a-cursor cursor-complementary-color raycaster="objects: .clickable" fuse-logger fuse="true" fuseTimeout="1000" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03;" material="color: black; shader: flat"
             animation__fusing="property: geometry.thetaLength; from: 0; to: 360; dur: 1500; startEvents: fusing;"
             animation__reset="property: geometry.thetaLength; from: 360; to: 360; dur: 1; startEvents: mouseleave;"
@@ -67,17 +69,30 @@
       <!-- Floor -->
       <a-plane 
         src="#floor-model"
-        width="20" height="20"
+        width="6" height="6"
         color="#aaaaaa"
         position="0 0 0" rotation="-90 0 0"
+      >
+      </a-plane>
+      <a-plane 
+        src="#floor-model"
+        width="6" height="6"
+        color="#aaaaaa"
+        position="0 0 -6" rotation="-90 0 0"
       >
       </a-plane>
 
       <!-- Roof -->
       <a-plane 
-        width="20" height="20"
+        width="6" height="6"
         src="#roof-model"
-        position="0 6 0" rotation="90 0 0"
+        position="0 4 0" rotation="90 0 0"
+      >
+      </a-plane>
+      <a-plane 
+        width="6" height="6"
+        src="#roof-model"
+        position="0 4 -6" rotation="90 0 0"
       >
       </a-plane>
 
@@ -98,11 +113,23 @@
         position="0 1.5 -3" rotation="0 0 0"
       >
       </a-entity>
+      <a-entity mixin="wall"
+        position="3 1.5 -6" rotation="0 -90 0"
+      >
+      </a-entity>
+      <a-entity mixin="wall"
+        position="-3 1.5 -6" rotation="0 90 0"
+      >
+      </a-entity>
+      <a-entity mixin="wall"
+        position="0 1.5 -9" rotation="0 0 0"
+      >
+      </a-entity>
 
       <a-box id="counter"
         width="2.5" height="1" depth="0.8"
         color="#692008" opacity="0"
-        position="0 0.5 -1.5" scale="0.7 0.5 0.5">
+        position="0 0 -1.5" scale="0.7 0.5 0.5">
         <a-entity gltf-model="#counter-model"></a-entity>
       </a-box>
 
@@ -111,8 +138,8 @@
         sound="src:url(assets/pop.mp3); positional: false;"
         width="0.5" height="0.8" depth="0.4"
         color="#111111" opacity="0"
-        position="-0.7 1.25 -1.5"
-        fuse-handler
+        position="-0.7 0 -1.5"
+        fuse-handler="#brew-button"
         animation="property: rotation;
                   from: 0 0 0; to: 0 5 0; dur: 250;
                   startEvents: click; pauseEvents: mouseleave;
@@ -120,7 +147,7 @@
                   loop: true; dir: alternate; easing: easeInSine">
           <a-entity class="clickable"
                     gltf-model="#coffee-machine-model"
-                    position="0 -0.25 0"
+                    position="0 0.5 0"
                     scale="0.008 0.008 0.008">
           </a-entity>
       </a-box>
@@ -130,9 +157,9 @@
         sound="src:url(assets/coffee-machine.mp3); positional: false;"
         visible="false"
         width="0.5" height="0.2" depth="0.05"
-        position="-0.7 2 -1.25"
+        position="-0.7 1.5 -1.25"
         animation__fusing="property: position;
-                          from: -0.7 2 -1.25; to: -0.7 2.05 -1.25;
+                          from: -0.7 1.5 -1.25; to: -0.7 1.55 -1.25;
                           startEvents: fusing; pauseEvents: mouseleave;
                           loop: true; dir: alternate"
          brew-button-clicked>
@@ -145,13 +172,24 @@
       </a-box>
 
       <a-box id="espresso-shot"
-        visible="false" color="#280c02"
+        visible="false" opacity="0"
         width="0.2" height="0.3" depth="0.2"
-        position="0 1.18 -1.5" scale="0.25 0.25 0.25" rotation="0 -90 0"
+        position="0 0.58 -1.5" scale="0.25 0.25 0.25" rotation="0 -90 0"
         grabbable
         raycaster="objects: .detectable; direction: 0 0 -1"
-        espresso-shot>
+        coffee="espresso">
         <a-entity gltf-model="#cup-model" class="grabbable"></a-entity>
+      </a-box>
+
+
+      <a-box id="latte"
+        visible="false" opacity="0"
+        width="0.2" height="0.3" depth="0.2"
+        position="1.5 0.58 -0.65" scale="0.25 0.25 0.25" rotation="0 0 0"
+        grabbable
+        raycaster="objects: .detectable; direction: 0 0 -1"
+        coffee="latte">
+        <a-entity gltf-model="#latte-model" class="grabbable"></a-entity>
       </a-box>
 
       <a-cylinder id="customer"
@@ -160,7 +198,7 @@
         material="opacity: 0;"
         radius="0.3"
         height="6"
-        position="-0.5 0.5 -2.5" scale="0.5 0.5 0.5"
+        position="-0.5 0 -2.5" scale="0.5 0.5 0.5"
         customer-order>
         <a-entity gltf-model="#customer-model" animation-mixer="clip: Idle;">
         </a-entity>
@@ -178,10 +216,11 @@
         </a-text>
       </a-box>
 
-      <a-box id="balance"
+      <a-box id="shop" class="clickable" shop
+        sound="src:url(assets/pop.mp3); positional: false;"
         position="-2 1.45 -2"
         width="0.5" height="0.5" depth="0.05">
-        <a-text value="$0"
+        <a-text value="Shop"
                 color="#000000" align="center"
                 position="0 0 0.06"
                 width="3">
@@ -198,6 +237,73 @@
                 position="0 0 0.06"
                 width="3">
         </a-text>
+      </a-box>
+
+      <!-- Shop Items -->
+      <a-entity id="shopItems"></a-entity>
+
+      <a-box id="tutorial" class="clickable"
+        position="-2 0.90 -2"
+        width="0.5" height="0.5" depth="0.05"
+        sound="src:url(assets/pop.mp3); positional: false;"
+        tutorial>
+        <a-text value="Tutorial"
+                color="#000000" align="center"
+                position="0 0 0.06"
+                width="3">
+        </a-text>
+      </a-box>
+
+      <a-box id="shopCounter"
+        width="2.5" height="1" depth="0.8"
+        color="#692008" opacity="0"
+        position="0 0 -7.5" scale="0.7 0.5 0.5">
+        <a-entity gltf-model="#counter-model"></a-entity>
+      </a-box>
+
+      <a-text position="0 1.2 -7.5" align="center"
+              value="$10"
+              color="#00ff00"
+              side="double"
+              width="10"
+              look-controls>
+        <a-box id="counterBuy" class="clickable"
+          position="0 -0.4 0"
+          width="0.7" height="0.3" depth="0.05"
+          sound="src:url(assets/cashier.mp3); positional: false;"
+          buy price="10">
+          <a-text value="BUY"
+                color="#000000" align="center"
+                position="0 0 0.06"
+                width="3">
+          </a-text>
+        </a-box>
+      </a-text>
+
+      <a-text position="1.75 1.85 -7.5" align="center"
+              value="$10"
+              color="#00ff00"
+              side="double"
+              width="10"
+              look-controls>
+        <a-box id="steamWandBuy" class="clickable"
+          position="0 -0.4 0"
+          width="0.7" height="0.3" depth="0.05"
+          sound="src:url(assets/cashier.mp3); positional: false;"
+          buy price="10">
+          <a-text value="BUY"
+                color="#000000" align="center"
+                position="0 0 0.06"
+                width="3">
+          </a-text>
+        </a-box>
+      </a-text>
+
+      <a-box id="shopSteamWand"
+        width="1" height="1" depth="1"
+        color="#692008" opacity="0"
+        position="1.75 1 -7.5" scale="0.07 0.07 0.07">
+        <a-entity gltf-model="#steam-wand-model"></a-entity>
       </a-box>
 
       <a-sky color="aqua"></a-sky>
