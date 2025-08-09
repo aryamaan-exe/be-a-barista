@@ -7,13 +7,23 @@ let bought = [];
 let orders = ["#espresso-image"];
 
 function say(text) {
-    let tutorialBox = document.getElementById("tutorial").children[0];
-    let buffer = "";
-    [...text].forEach((char, i) => {
-        setTimeout(() => {
-            buffer += char;
-            tutorialBox.setAttribute("value", buffer);
-        }, 50 * i);
+    return new Promise((resolve) =>  {
+        let tutorialBox = document.getElementById("tutorial").children[0];
+        tutorialBox.parentElement.setAttribute("visible", text);
+        let buffer = "";
+        [...text].forEach((char, i) => {
+            setTimeout(() => {
+                buffer += char;
+                tutorialBox.setAttribute("value", buffer);
+                if (i === text.length - 1) {
+                    const handleClick = () => {
+                        tutorialBox.parentElement.removeEventListener("click", handleClick);
+                        resolve();
+                    };
+                    tutorialBox.parentElement.addEventListener("click", handleClick);
+                }
+            }, 50 * i);
+        });
     });
 }
 
@@ -37,19 +47,17 @@ AFRAME.registerComponent("play-music", {
 AFRAME.registerComponent("tutorial", {
     init: function() {
         let tutorial = this.el;
-        tutorial.addEventListener("click", () => {
+        tutorial.addEventListener("click", async () => {
             tutorial.components.sound.playSound();
             tutorialMode = true;
             let tutorialBox = document.getElementById("tutorial");
             tutorialBox.setAttribute("visible", true);
-            say("So you want to run your own coffee shop?");
-            // say("Well, we don't have much time, we already have our first customer!");
-            // say("Look at the coffee machine and then the 'Brew' button!");
+            await say("So you want to run your own coffee shop?");
+            await say("Well, we don't have much time, we already have our first customer!");
+            await say("Look at the coffee machine and then the 'Brew' button!");
+            await say(false);
         });
 
-        tutorial.addEventListener("selectstart", () => {
-            console.log("GYAT");
-        })
     }
 });
 
@@ -81,14 +89,15 @@ AFRAME.registerComponent("brew-button-clicked", {
         brewButton.addEventListener("click", () => {
             if (brewButton.getAttribute("visible")) {
                 brewButton.components.sound.playSound();
-                setTimeout(() => {
+                setTimeout(async () => {
                     let espresso = document.querySelector("#espresso-shot");
                     espresso.setAttribute("position", { x: 0, y: 0.58, z: -1.5 });
                     espresso.setAttribute("visible", true);
                     brewButton.setAttribute("fusing", false);
                     brewButton.setAttribute("visible", false);
                     if (tutorialMode) {
-                        alert("We've made an espresso shot! Now you gotta grab it and give it to the customer.");
+                        await say("We've made an espresso shot! Now you gotta grab it and give it to the customer.");
+                        await say(false);
                     }
                 }, 5000);
             }
@@ -150,7 +159,7 @@ AFRAME.registerComponent("customer-order", {
         random();
         chooseOrder();
 
-        customer.addEventListener("order", function (event) {
+        customer.addEventListener("order", async function (event) {
             let orderBox = document.getElementById("order-image");
             let order = orderBox.getAttribute("src");
             let given = event.detail.coffee;
@@ -165,12 +174,13 @@ AFRAME.registerComponent("customer-order", {
             chooseOrder();
             score += event.detail.coffee === "espresso" ? 5 : 10;
             if (tutorialMode) {
-                alert("Good job! You're a natural.")
-                alert("I think you can run this shop on your own. I need to go get some milk.")
-                alert("Before that, what do you wanna call your shop? Yes, it's your shop now!")
+                await say("Good job! You're a natural.")
+                await say("I think you can run this shop on your own. I need to go get some milk.")
+                await say("Before that, what do you wanna call your shop? Yes, it's your shop now!")
                 let name = prompt("Name your shop:");
-                alert("Seriously? " + name + "?");
-                alert("That name's kinda goofy, but I guess it could work. Anyway, bye bye!");
+                await say("Seriously? " + name + "?");
+                await say("That name's kinda goofy, but I guess it could work. Anyway, bye bye!");
+                await say(false);
                 tutorialMode = false;
             }
         });
