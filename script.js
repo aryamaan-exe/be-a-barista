@@ -1,7 +1,7 @@
 // Created by: Aryamaan Goswamy
 // Duplication not allowed. GitHub repository created for documentation purposes.
 
-let score = 20;
+let score = 0;
 let tutorialMode = false;
 let bought = [];
 let orders = ["#espresso-image"];
