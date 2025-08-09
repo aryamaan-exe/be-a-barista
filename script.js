@@ -4,6 +4,18 @@
 let score = 20;
 let tutorialMode = false;
 let bought = [];
+let orders = ["#espresso-image"];
+
+function say(text) {
+    let tutorialBox = document.getElementById("tutorial").children[0];
+    let buffer = "";
+    [...text].forEach((char, i) => {
+        setTimeout(() => {
+            buffer += char;
+            tutorialBox.setAttribute("value", buffer);
+        }, 50 * i);
+    });
+}
 
 AFRAME.registerComponent("play-music", {
     init: function() {
@@ -28,10 +40,16 @@ AFRAME.registerComponent("tutorial", {
         tutorial.addEventListener("click", () => {
             tutorial.components.sound.playSound();
             tutorialMode = true;
-            alert("So you want to run your own coffee shop?");
-            alert("Well, we don't have much time, we already have our first customer!");
-            alert("Look at the coffee machine and then the 'Brew' button!");
+            let tutorialBox = document.getElementById("tutorial");
+            tutorialBox.setAttribute("visible", true);
+            say("So you want to run your own coffee shop?");
+            // say("Well, we don't have much time, we already have our first customer!");
+            // say("Look at the coffee machine and then the 'Brew' button!");
         });
+
+        tutorial.addEventListener("selectstart", () => {
+            console.log("GYAT");
+        })
     }
 });
 
@@ -42,12 +60,12 @@ AFRAME.registerComponent("fuse-handler", {
         let button = document.querySelector(buttonID);
         this.el.addEventListener("click", () => {
             this.el.components.sound.playSound();
-            document.querySelector(buttonID).setAttribute("visible", "true");
+            document.querySelector(buttonID).setAttribute("visible", true);
         });
         this.el.addEventListener("mouseleave", () => {
             setTimeout(() => {
                 if (button.getAttribute("fusing") !== "true") {
-                    document.querySelector(buttonID).setAttribute("visible", "false");
+                    document.querySelector(buttonID).setAttribute("visible", false);
                 }
             }, 2500);
         });
@@ -64,18 +82,20 @@ AFRAME.registerComponent("brew-button-clicked", {
             if (brewButton.getAttribute("visible")) {
                 brewButton.components.sound.playSound();
                 setTimeout(() => {
-                    document.querySelector("#espresso-shot").setAttribute("visible", "true");
-                    brewButton.setAttribute("fusing", "false");
-                    brewButton.setAttribute("visible", "false");
+                    let espresso = document.querySelector("#espresso-shot");
+                    espresso.setAttribute("position", { x: 0, y: 0.58, z: -1.5 });
+                    espresso.setAttribute("visible", true);
+                    brewButton.setAttribute("fusing", false);
+                    brewButton.setAttribute("visible", false);
                     if (tutorialMode) {
                         alert("We've made an espresso shot! Now you gotta grab it and give it to the customer.");
                     }
-                }, 5);
+                }, 5000);
             }
         });
         brewButton.addEventListener("mouseleave", () => {
             setTimeout(() => {
-                document.querySelector("#brew-button").setAttribute("visible", "false");
+                document.querySelector("#brew-button").setAttribute("visible", false);
             }, 1000);
         });
     }
@@ -120,11 +140,29 @@ AFRAME.registerComponent("customer-order", {
             customer.setAttribute("position", ({...customer.getAttribute("position"), x: Math.random() * 2 - 0.5}));
         }
 
+        function chooseOrder() {
+            let orderBox = document.getElementById("order-image");
+            let order = orders[Math.round(Math.random())];
+            if (!order) order = "#espresso-image";
+            orderBox.setAttribute("src", order);
+        }
+
         random();
+        chooseOrder();
 
         customer.addEventListener("order", function (event) {
+            let orderBox = document.getElementById("order-image");
+            let order = orderBox.getAttribute("src");
+            let given = event.detail.coffee;
+            let coffee = event.detail.el;
+
+            if (order === "#latte-image" && given === "espresso") return;
+            if (order === "#espresso-image" && given === "latte") return;
+
+            coffee.setAttribute("visible", false);
             customer.components.sound.playSound();
             random();
+            chooseOrder();
             score += event.detail.coffee === "espresso" ? 5 : 10;
             if (tutorialMode) {
                 alert("Good job! You're a natural.")
@@ -159,9 +197,7 @@ AFRAME.registerComponent("coffee", {
             let distance = coffeePos.distanceTo(customerPos);
 
             if (distance < 1.05) {
-                coffee.setAttribute("visible", false);
-                coffee.setAttribute("position", {x: 0, y: 1.18, z: -1.5});
-                customer.emit("order", {coffee: this.data});
+                customer.emit("order", {coffee: this.data, el: coffee});
             } else if (this.data !== "latte") {
                 let steamWand = document.querySelector("#steamWand");
                 let steamWandPos = steamWand.object3D.position;
@@ -169,7 +205,6 @@ AFRAME.registerComponent("coffee", {
 
                 if (distance < 0.75) {
                     coffee.setAttribute("visible", false);
-                    coffee.setAttribute("position", { x: 0, y: 1.18, z: -1.5 });
                     let latte = document.getElementById("latte");
                     latte.setAttribute("position", { x: 1.5, y: 0.58, z: -0.65 });
                     latte.setAttribute("visible", true);
@@ -226,6 +261,7 @@ AFRAME.registerComponent("buy", {
 
                 shopItems.insertBefore(steamWand, shopItems.firstChild);
                 bought.push("steamWand");
+                orders.push("#latte-image");
             }
 
             if (score >= price) {
@@ -242,6 +278,16 @@ AFRAME.registerComponent("shop", {
             this.el.components.sound.playSound();
             const camera = document.getElementById("camera");
             camera.setAttribute("position", { x: 0, y: 1, z: -6 });
+        });
+    }
+});
+
+AFRAME.registerComponent("back-button", {
+    init: function () {
+        this.el.addEventListener("click", () => {
+            this.el.components.sound.playSound();
+            const camera = document.getElementById("camera");
+            camera.setAttribute("position", { x: 0, y: 1, z: 0 });
         });
     }
 });
