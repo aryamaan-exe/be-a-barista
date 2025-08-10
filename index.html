@@ -194,23 +194,25 @@
         <a-entity gltf-model="#latte-model" class="grabbable"></a-entity>
       </a-box>
 
-      <a-cylinder id="customer"
-        sound="src: url(assets/cashier.mp3); positional: false"
-        visible="true" color="#977575"
-        material="opacity: 0;"
-        radius="0.3"
-        height="6"
-        position="-0.5 0 -2.5" scale="0.5 0.5 0.5"
-        customer-order>
-        <a-entity gltf-model="#customer-model" animation-mixer="clip: Idle;">
-          <a-box id="order-image"
-            position="0 3.5 0"
-            width="1" height="1" depth="0.01"
-            color="#cccccc"
-            src="#espresso-image" />
-          </a-box>
-        </a-entity>
-      </a-cylinder>
+      <a-entity id="customers">
+        <a-cylinder
+          sound="src: url(assets/cashier.mp3); positional: false"
+          visible="true" color="#977575"
+          material="opacity: 0;"
+          radius="0.3"
+          height="6"
+          position="0.2 0 -2.5" scale="0.5 0.5 0.5"
+          customer-order>
+          <a-entity gltf-model="#customer-model" animation-mixer="clip: Idle;">
+            <a-box
+              position="0 3.5 0"
+              width="1" height="1" depth="0.01"
+              color="#cccccc"
+              src="#espresso-image" />
+            </a-box>
+          </a-entity>
+        </a-cylinder>
+      </a-entity>
 
       <a-box id="play-music" class="clickable"
         position="-2 2 -2"
