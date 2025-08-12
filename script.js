@@ -2,19 +2,17 @@ let score = 0;
 let tutorialMode = false;
 let bought = [];
 let orders = ["#espresso-image"];
+let customerPositions = [];
+let xSpots = [];
+let zSpots = [];
 
-function getRandomPosition(customerElement) {
-    if (!orders.includes("#latte-image")) {
-        return {x: Math.random() * 2 - 0.5, y: 0, z: -2.5}
-    }
+for (let x = -0.5; x <= 3.5; x += 0.9) {
+    xSpots.push(x);
+}
+xSpots.splice(1, 1);
 
-    if (Math.round(Math.random())) {
-        // math.round a float from 0-1 = 50-50 chance
-        return {x: Math.random() * 2 - 0.5, y: 0, z: -2.5}
-    } else {
-        customerElement.setAttribute("rotation", {x: 0, y: -90, z: 0})
-        return {x: 2.5, y: 0, z: Math.random() * 2 - 1.8}
-    }
+for (let z = -1.8; z <= 2.2; z += 0.9) {
+    zSpots.push(z);
 }
 
 function createCustomerElement(numCustomers=1) {
@@ -38,7 +36,9 @@ function createCustomerElement(numCustomers=1) {
         customerElement.setAttribute("scale", {x: 0.5, y: 0.5, z: 0.5});
         customerElement.setAttribute("customer-order", true);
         let customerModel = document.createElement("a-entity");
-        customerModel.setAttribute("gltf-model", "#customer-model");
+        modelChoices = ["#og-customer-model", "#goofy-kid-customer-model", "#bald-kid-customer-model"]
+        let randomModel = modelChoices[Math.floor(Math.random() * modelChoices.length)]
+        customerModel.setAttribute("gltf-model", randomModel);
         customerModel.setAttribute("animation-mixer", "clip: Idle;");
         let orderImage = document.createElement("a-box");
         orderImage.setAttribute("position", {x: 0, y: 3.5, z: 0});
@@ -47,15 +47,38 @@ function createCustomerElement(numCustomers=1) {
         orderImage.setAttribute("depth", 0.01);
         orderImage.setAttribute("color", "#cccccc");
 
-        customerElement.setAttribute("position", getRandomPosition(customerElement));
+        let chosenX;
+        let chosenZ;
+        let randomX;
+        let randomZ;
+        while (!(chosenX || chosenZ)) {
+            if (!bought.includes("steamWand") || Math.round(Math.random())) {
+                randomX = xSpots[Math.floor(Math.random() * xSpots.length)];
+                customerElement.setAttribute("position", {x: randomX, y: 0, z: -2.64});
+                if (!customerPositions.includes(randomX)) {
+                    chosenX = true;
+                }
+                customerPositions.push(randomX);
+            } else {
+                randomZ = zSpots[Math.floor(Math.random() * zSpots.length)];
+                customerElement.setAttribute("position", {x: 4.6, y: 0, z: randomZ});
+                customerElement.setAttribute("rotation", {x: 0, y: -90, z: 0})
+                if (!customerPositions.includes(randomZ)) {
+                    chosenZ = true;
+                }
+                customerPositions.push(randomZ);
+            }
+        }
 
         customerModel.appendChild(orderImage);
         customerElement.appendChild(customerModel);
         chooseOrder(customerElement);
         document.getElementById("customers").appendChild(customerElement);
         customers.push(customerElement);
+
+        if (chosenX) return randomX;
+        return randomZ;
     }
-    return customers;
 }
 
 function say(text) {
@@ -206,14 +229,13 @@ AFRAME.registerComponent("customer-order", {
             if (order === "#espresso-image" && given === "latte") return;
 
             coffee.setAttribute("visible", false);
-            customer.components.sound.playSound();
-            customer.remove();
             if (Math.random() * 100 < 33) {
                 // 1/3 chance
-                createCustomerElement(2);
+                randomChosen = createCustomerElement(5);
             } else {
-                createCustomerElement(1);
+                randomChosen = createCustomerElement(5);
             }
+
             score += event.detail.coffee === "espresso" ? 5 : 10;
             if (tutorialMode) {
                 await say("Good job! You're a natural.")
@@ -225,8 +247,11 @@ AFRAME.registerComponent("customer-order", {
                 await say(false);
                 tutorialMode = false;
             }
+            document.getElementById("counterBuy").components.sound.playSound();
+            customerPositions.splice(customerPositions.indexOf(randomChosen), 1);
+            customer.remove();
         });
-    }
+    },
 });
 
 AFRAME.registerComponent("coffee", {
@@ -258,7 +283,7 @@ AFRAME.registerComponent("coffee", {
             }
 
             if (shortestDistance < 1.05) {
-                closestCustomer.emit("order", {coffee: this.data, el: coffee, customer: closestCustomer});
+                closestCustomer.emit("order", {coffee: this.data, el: coffee});
             } else if (this.data !== "latte") {
                 let steamWand = document.querySelector("#steamWand");
                 let steamWandPos = steamWand.object3D.position;
@@ -292,9 +317,9 @@ AFRAME.registerComponent("buy", {
                 counter.setAttribute("height", "1");
                 counter.setAttribute("depth", "0.8");
                 counter.setAttribute("opacity", "0");
-                counter.setAttribute("position", "1.5 0 0");
+                counter.setAttribute("position", "3.2 0 1.5");
                 counter.setAttribute("rotation", "0 90 0");
-                counter.setAttribute("scale", "0.7 0.5 0.5");
+                counter.setAttribute("scale", "1.5 0.5 0.5");
                 counterModel.setAttribute("gltf-model", "#counter-model");
                 counter.appendChild(counterModel);
 
@@ -313,7 +338,7 @@ AFRAME.registerComponent("buy", {
                 steamWand.setAttribute("height", "1");
                 steamWand.setAttribute("depth", "1");
                 steamWand.setAttribute("opacity", "0");
-                steamWand.setAttribute("position", {x: 1.5, y: 1.5, z: 0.5});
+                steamWand.setAttribute("position", {x: 3.2, y: 1.5, z: 3.5});
                 steamWand.setAttribute("rotation", "0 -90 0");
                 steamWand.setAttribute("scale", "0.07 0.07 0.07");
                 steamWandModel.setAttribute("gltf-model", "#steam-wand-model");
@@ -325,6 +350,10 @@ AFRAME.registerComponent("buy", {
                 shopItems.appendChild(steamWand);
                 bought.push("steamWand");
                 orders.push("#latte-image");
+            } else if (item === "posterABuy") {
+                document.getElementById("poster-A").setAttribute("visible", true);
+            } else if (item === "posterBBuy") {
+                document.getElementById("poster-B").setAttribute("visible", true);
             }
 
             score -= price;

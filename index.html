@@ -27,10 +27,15 @@
         <img id="roof-model" src="assets/roof.jpg" />
         <img id="espresso-image" src="assets/espresso.png" />
         <img id="latte-image" src="assets/latte.png" />
+        <img id="coffee-poster-image" src="assets/coffee-poster.jpg" />
+        <img id="coffee-poster-A" src="assets/coffee-poster-2.png" />
+        <img id="coffee-poster-B" src="assets/coffee-poster-3.png" />
         <a-asset-item id="counter-model" src="assets/table.glb" />
         <a-asset-item id="coffee-machine-model" src="assets/coffee-machine.glb" />
         <a-asset-item id="cup-model" src="assets/cup.glb" />
-        <a-asset-item id="customer-model" src="assets/customer.glb" />
+        <a-asset-item id="og-customer-model" src="assets/customer.glb" />
+        <a-asset-item id="goofy-kid-customer-model" src="assets/customer2.glb" />
+        <a-asset-item id="bald-kid-customer-model" src="assets/customer3.glb" />
         <a-asset-item id="steam-wand-model" src="assets/steam-wand.glb" />
         <a-asset-item id="latte-model" src="assets/latte.glb" />
       </a-assets>
@@ -38,13 +43,13 @@
       <!-- Mixins -->
       <a-mixin id="wall"
         geometry="primitive: plane;
-                  width: 6; height: 6"
-        material="src: #walls-model; color: #ffe388; side: double">
+                  width: 9; height: 9"
+        material="src: #walls-model; color: #ffe388; side: double; roughness: 1">
       </a-mixin>
 
       <!-- Camera + cursor -->
       <a-entity id="rig" position="-0.5 0 0">
-        <a-camera id="camera" look-controls position="0 1 0" wasd-controls-enabled="false">
+        <a-camera id="camera" look-controls position="0 1 0" wasd-controls-enabled="true">
           <a-cursor cursor-complementary-color raycaster="objects: .clickable" fuse-logger fuse="true" fuseTimeout="1000" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03;" material="color: black; shader: flat"
             animation__fusing="property: geometry.thetaLength; from: 0; to: 360; dur: 1500; startEvents: fusing;"
             animation__reset="property: geometry.thetaLength; from: 360; to: 360; dur: 1; startEvents: mouseleave;"
@@ -71,67 +76,91 @@
       <!-- Floor -->
       <a-plane 
         src="#floor-model"
-        width="6" height="6"
+        width="9" height="9"
         color="#aaaaaa"
-        position="0 0 0" rotation="-90 0 0"
+        position="1.5 0 1.5" rotation="-90 0 0"
       >
       </a-plane>
       <a-plane 
         src="#floor-model"
-        width="6" height="6"
+        width="9" height="9"
         color="#aaaaaa"
-        position="0 0 -6" rotation="-90 0 0"
+        position="1.5 0 -7.5" rotation="-90 0 0"
       >
       </a-plane>
 
       <!-- Roof -->
       <a-plane 
-        width="6" height="6"
+        width="9" height="9"
         src="#roof-model"
-        position="0 4 0" rotation="90 0 0"
+        position="1.5 6 1.5" rotation="90 0 0"
       >
       </a-plane>
       <a-plane 
-        width="6" height="6"
+        width="9" height="9"
         src="#roof-model"
-        position="0 4 -6" rotation="90 0 0"
+        position="1.5 6 -7.5" rotation="90 0 0"
       >
       </a-plane>
 
       <!-- Walls -->
       <a-entity mixin="wall"
-        position="3 1.5 0" rotation="0 -90 0"
+        position="6 1.5 1.5" rotation="0 -90 0"
       >
       </a-entity>
       <a-entity mixin="wall"
-        position="0 1.5 3" rotation="0 180 0"
+        position="1.5 1.5 6" rotation="0 180 0"
       >
       </a-entity>
       <a-entity mixin="wall"
-        position="-3 1.5 0" rotation="0 90 0"
+        position="-3 1.5 1.5" rotation="0 90 0"
       >
       </a-entity>
       <a-entity mixin="wall"
-        position="0 1.5 -3" rotation="0 0 0"
+        position="1.5 1.5 -3" rotation="0 0 0"
       >
       </a-entity>
       <a-entity mixin="wall"
-        position="3 1.5 -6" rotation="0 -90 0"
+        position="6 1.5 -7.5" rotation="0 -90 0"
       >
       </a-entity>
       <a-entity mixin="wall"
-        position="-3 1.5 -6" rotation="0 90 0"
+        position="-3 1.5 -7.5" rotation="0 90 0"
       >
       </a-entity>
       <a-entity mixin="wall"
-        position="0 1.5 -9" rotation="0 0 0"
+        position="1.5 1.5 -12" rotation="0 0 0"
       >
       </a-entity>
+
+      <!-- Other stuff -->
+
+      <a-box src="#coffee-poster-image"
+        width="2" height="2" depth="0.01"
+        position="0 3 -2.9"
+      >
+      </a-box>
+
+      <a-box id="poster-A" src="#coffee-poster-A"
+        visible="false"
+        width="2" height="2" depth="0.01"
+        position="6 3 -1"
+        rotation="0 -90 0"
+      >
+      </a-box>
+
+      <a-box id="poster-B" src="#coffee-poster-B"
+        visible="false"
+        width="2" height="2" depth="0.01"
+        position="3 3 6"
+        rotation="0 180 0"
+      >
+      </a-box>
 
       <a-box id="counter"
         width="2.5" height="1" depth="0.8"
         color="#692008" opacity="0"
-        position="0 0 -1.5" scale="0.7 0.5 0.5">
+        position="1 0 -1.5" scale="1.5 0.5 0.5">
         <a-entity gltf-model="#counter-model"></a-entity>
       </a-box>
 
@@ -201,9 +230,9 @@
           material="opacity: 0;"
           radius="0.3"
           height="6"
-          position="0.2 0 -2.5" scale="0.5 0.5 0.5"
+          position="0.4 0 -2.64" scale="0.5 0.5 0.5"
           customer-order>
-          <a-entity gltf-model="#customer-model" animation-mixer="clip: Idle;">
+          <a-entity gltf-model="#og-customer-model" animation-mixer="clip: Idle;">
             <a-box
               position="0 3.5 0"
               width="1" height="1" depth="0.01"
@@ -322,6 +351,60 @@
         position="1.75 1 -7.5" scale="0.07 0.07 0.07">
         <a-entity gltf-model="#steam-wand-model"></a-entity>
       </a-box>
+
+      <a-box id="shopPosterA"
+        width="2" height="2" depth="0.01"
+        src="#coffee-poster-A"
+        position="3.5 1 -7"
+        rotation="0 -75 0"
+      >
+      </a-box>
+
+      <a-text position="3.5 2.55 -7" align="center"
+            value="$5"
+            color="#00ff00"
+            side="double"
+            width="10"
+            look-controls>
+        <a-box id="posterABuy" class="clickable"
+          position="0 -0.4 0"
+          width="0.7" height="0.3" depth="0.05"
+          sound="src:url(assets/cashier.mp3); positional: false;"
+          buy price="5">
+          <a-text value="BUY"
+                color="#000000" align="center"
+                position="0 0 0.06"
+                width="3">
+          </a-text>
+        </a-box>
+      </a-text>
+
+      <a-box id="shopPosterB"
+        width="2" height="2" depth="0.01"
+        src="#coffee-poster-B"
+        position="3.5 1 -5"
+        rotation="0 75 0"
+      >
+      </a-box>
+      
+      <a-text position="3.5 2.55 -5" align="center"
+            value="$5"
+            color="#00ff00"
+            side="double"
+            width="10"
+            look-controls>
+        <a-box id="posterBBuy" class="clickable"
+          position="0 -0.4 0"
+          width="0.7" height="0.3" depth="0.05"
+          sound="src:url(assets/cashier.mp3); positional: false;"
+          buy price="5">
+          <a-text value="BUY"
+                color="#000000" align="center"
+                position="0 0 0.06"
+                width="3">
+          </a-text>
+        </a-box>
+      </a-text>
 
       <a-sky color="aqua"></a-sky>
     </a-scene>
